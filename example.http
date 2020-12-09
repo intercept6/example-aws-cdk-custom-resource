@@ -1,0 +1,14 @@
+### 🟢 fizzbuzz
+GET https://{{host}}/fizzbuzz?upper-limit=15
+
+### 🔴 zero
+
+GET https://{{host}}/fizzbuzz?upper-limit=0
+
+### 🔴 minus
+
+GET https://{{host}}/fizzbuzz?upper-limit=-10
+
+### 🔴 string
+
+GET https://{{host}}/fizzbuzz?upper-limit=a

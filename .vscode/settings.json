@@ -1,0 +1,16 @@
+{
+  "editor.tabSize": 2,
+  "rest-client.environmentVariables": {
+    "$shared": {
+      "version": "v1"
+    },
+    "development": {
+      "host": "example.com",
+      "token": "development token"
+    },
+    "production": {
+      "host": "example.com",
+      "token": "product token"
+    }
+  }
+}
