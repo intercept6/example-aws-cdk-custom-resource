@@ -10,4 +10,13 @@ export type TargetGroupProperties = Partial<{
   ProtocolVersion: 'HTTP1' | 'HTTP2' | 'GRPC'
   VpcId: string
   TargetType: 'instance' | 'ip' | 'lambda'
+  HealthCheckEnabled: boolean
+  HealthCheckIntervalSeconds: number
+  HealthCheckPath: string
+  HealthCheckPort: string
+  HealthCheckProtocol: 'HTTP' | 'HTTPS' | 'TCP' | 'TCP_UDP' | 'TLS' | 'UDP'
+  HealthCheckTimeoutSeconds: number
+  HealthyThresholdCount: number
+  Matcher: { [HttpCode: string]: string }
+  UnhealthyThresholdCount: number
 }>

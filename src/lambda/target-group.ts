@@ -1,8 +1,8 @@
 import {
-  TargetGroupProperties,
   ATTR_LOAD_BALANCER_ARNS,
   ATTR_TARGET_GROUP_FULL_NAME,
   ATTR_TARGET_GROUP_NAME,
+  TargetGroupProperties,
 } from './api'
 import {
   OnEventRequest,
@@ -17,32 +17,60 @@ const elbv2 = new ELBv2()
 const createTargetGroup = async (
   event: OnEventRequest
 ): Promise<OnEventResponse> => {
-  const properties = event.ResourceProperties as TargetGroupProperties
+  const {
+    Name,
+    Port,
+    Protocol,
+    ProtocolVersion,
+    VpcId,
+    TargetType,
+    HealthCheckProtocol,
+    HealthCheckPath,
+    Matcher,
+    HealthCheckIntervalSeconds,
+    HealthCheckPort,
+    UnhealthyThresholdCount,
+    HealthyThresholdCount,
+    HealthCheckTimeoutSeconds,
+    HealthCheckEnabled,
+  } = event.ResourceProperties as TargetGroupProperties
 
-  if (!properties.Name) {
+  if (!Name) {
     throw new Error(`Name is required`)
   }
-  if (!properties.Port) {
+  if (!Port) {
     throw new Error(`Port is required`)
   }
-  if (!properties.ProtocolVersion) {
+  if (!Protocol) {
+    throw new Error(`Protocol is required`)
+  }
+  if (!ProtocolVersion) {
     throw new Error(`ProtocolVersion is required`)
   }
-  if (!properties.VpcId) {
+  if (!VpcId) {
     throw new Error(`VpcId is required`)
   }
-  if (!properties.TargetType) {
+  if (!TargetType) {
     throw new Error(`TargetType is required`)
   }
 
   const tg = await elbv2
     .createTargetGroup({
-      Name: properties.Name,
-      Port: properties.Port,
-      Protocol: properties.Protocol,
-      ProtocolVersion: properties.ProtocolVersion,
-      VpcId: properties.VpcId,
-      TargetType: properties.TargetType,
+      Name,
+      Port,
+      Protocol,
+      ProtocolVersion,
+      VpcId,
+      TargetType,
+      HealthCheckEnabled,
+      HealthCheckIntervalSeconds,
+      HealthCheckPath,
+      HealthCheckPort,
+      HealthCheckProtocol,
+      HealthCheckTimeoutSeconds,
+      HealthyThresholdCount,
+      Matcher,
+      UnhealthyThresholdCount,
     })
     .promise()
 
@@ -69,12 +97,52 @@ const deleteTargetGroup = async (
 
   return {}
 }
-
 const updateTargetGroup = async (
   event: OnEventRequest
 ): Promise<OnEventResponse> => {
-  await deleteTargetGroup(event)
-  return createTargetGroup(event)
+  if (!event.PhysicalResourceId) {
+    throw new Error('PhysicalResourceId(TargetGroupArn) is required')
+  }
+
+  const {
+    HealthCheckEnabled,
+    HealthCheckIntervalSeconds,
+    HealthCheckPath,
+    HealthCheckPort,
+    HealthCheckProtocol,
+    HealthCheckTimeoutSeconds,
+    HealthyThresholdCount,
+    Matcher,
+    UnhealthyThresholdCount,
+  } = event.ResourceProperties as TargetGroupProperties
+
+  const tg = await elbv2
+    .modifyTargetGroup({
+      TargetGroupArn: event.PhysicalResourceId,
+      HealthCheckEnabled,
+      HealthCheckIntervalSeconds,
+      HealthCheckPath,
+      HealthCheckPort,
+      HealthCheckProtocol,
+      HealthCheckTimeoutSeconds,
+      HealthyThresholdCount,
+      Matcher,
+      UnhealthyThresholdCount,
+    })
+    .promise()
+
+  console.log('update response: ', tg.TargetGroups![0])
+
+  return {
+    PhysicalResourceId: tg.TargetGroups![0].TargetGroupArn,
+    Data: {
+      [ATTR_LOAD_BALANCER_ARNS]: tg.TargetGroups![0].LoadBalancerArns,
+      [ATTR_TARGET_GROUP_NAME]: tg.TargetGroups![0].TargetGroupName,
+      [ATTR_TARGET_GROUP_FULL_NAME]: tg.TargetGroups![0].TargetGroupArn!.split(
+        ':'
+      )[5],
+    },
+  }
 }
 
 export const handler = async (
@@ -87,6 +155,36 @@ export const handler = async (
       return createTargetGroup(event)
     }
     case 'Update': {
+      const targetGroupProps = event.ResourceProperties as TargetGroupProperties
+      const oldTargetGroupProps = event.OldResourceProperties as TargetGroupProperties
+
+      if (targetGroupProps.Name !== oldTargetGroupProps.Name) {
+        await deleteTargetGroup(event)
+        return createTargetGroup(event)
+      }
+      if (targetGroupProps.Port !== oldTargetGroupProps.Port) {
+        await deleteTargetGroup(event)
+        return createTargetGroup(event)
+      }
+      if (targetGroupProps.Protocol !== oldTargetGroupProps.Protocol) {
+        await deleteTargetGroup(event)
+        return createTargetGroup(event)
+      }
+      if (
+        targetGroupProps.ProtocolVersion !== oldTargetGroupProps.ProtocolVersion
+      ) {
+        await deleteTargetGroup(event)
+        return createTargetGroup(event)
+      }
+      if (targetGroupProps.TargetType !== oldTargetGroupProps.TargetType) {
+        await deleteTargetGroup(event)
+        return createTargetGroup(event)
+      }
+      if (targetGroupProps.VpcId !== oldTargetGroupProps.VpcId) {
+        await deleteTargetGroup(event)
+        return createTargetGroup(event)
+      }
+
       return updateTargetGroup(event)
     }
     case 'Delete': {
