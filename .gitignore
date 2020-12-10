@@ -13,3 +13,5 @@ output.json
 
 # log
 yarn-error.log
+
+.idea
