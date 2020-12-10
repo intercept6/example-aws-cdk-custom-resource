@@ -1,5 +1,11 @@
 import { TargetGroupProperties } from '../src/lambda/api'
+import { Certificate } from '@aws-cdk/aws-certificatemanager'
 import { SubnetType, Vpc } from '@aws-cdk/aws-ec2'
+import {
+  ApplicationLoadBalancer,
+  ApplicationProtocol,
+  ApplicationTargetGroup,
+} from '@aws-cdk/aws-elasticloadbalancingv2'
 import { PolicyStatement } from '@aws-cdk/aws-iam'
 import { Code, Function, Runtime } from '@aws-cdk/aws-lambda'
 import {
@@ -13,8 +19,16 @@ import {
 import { Provider } from '@aws-cdk/custom-resources'
 import { resolve } from 'path'
 
+export type ExampleAwsCdkCustomResourceProps = StackProps & {
+  certificateArn: string
+}
+
 export class ExampleAwsCdkCustomResource extends Stack {
-  constructor(scope: Construct, id: string, props?: StackProps) {
+  constructor(
+    scope: Construct,
+    id: string,
+    props: ExampleAwsCdkCustomResourceProps
+  ) {
     super(scope, id, props)
 
     const vpc = new Vpc(this, 'Vpc', {
@@ -56,7 +70,7 @@ export class ExampleAwsCdkCustomResource extends Stack {
     const provider = new Provider(this, 'provider', {
       onEventHandler: onEvent,
     })
-    new CustomResource(this, 'custom-target-group', {
+    const customResource = new CustomResource(this, 'custom-target-group', {
       serviceToken: provider.serviceToken,
       properties: {
         Name: 'grpc-tg',
@@ -67,5 +81,28 @@ export class ExampleAwsCdkCustomResource extends Stack {
         TargetType: 'ip',
       } as TargetGroupProperties,
     })
+    const grpcTargetGroup = ApplicationTargetGroup.fromTargetGroupAttributes(
+      this,
+      'grpc-target-group',
+      {
+        targetGroupArn: customResource.ref,
+      }
+    )
+
+    const certificate = Certificate.fromCertificateArn(
+      this,
+      'certificate',
+      props.certificateArn
+    )
+
+    new ApplicationLoadBalancer(this, 'alb', { vpc }).addListener(
+      'grpc-listener',
+      {
+        protocol: ApplicationProtocol.HTTPS,
+        port: 50051,
+        defaultTargetGroups: [grpcTargetGroup],
+        certificates: [certificate],
+      }
+    )
   }
 }

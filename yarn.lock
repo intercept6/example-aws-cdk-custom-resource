@@ -54,7 +54,7 @@
     "@aws-cdk/core" "1.77.0"
     constructs "^3.2.0"
 
-"@aws-cdk/aws-certificatemanager@1.77.0":
+"@aws-cdk/aws-certificatemanager@1.77.0", "@aws-cdk/aws-certificatemanager@1.x":
   version "1.77.0"
   resolved "https://registry.yarnpkg.com/@aws-cdk/aws-certificatemanager/-/aws-certificatemanager-1.77.0.tgz#c56bf2de67b3c81f48be75a291d786a876ff2599"
   integrity sha512-VnxWY7awwL0U2oIz1QUqnIruwVzeZPKPsnl+kiFK04Emte7z155tesEzv4DdDSh6fghIiPjTiB4utcMWTw1knA==
@@ -148,6 +148,23 @@
     "@aws-cdk/cloud-assembly-schema" "1.77.0"
     "@aws-cdk/core" "1.77.0"
     "@aws-cdk/cx-api" "1.77.0"
+    constructs "^3.2.0"
+
+"@aws-cdk/aws-elasticloadbalancingv2@1.x":
+  version "1.77.0"
+  resolved "https://registry.yarnpkg.com/@aws-cdk/aws-elasticloadbalancingv2/-/aws-elasticloadbalancingv2-1.77.0.tgz#8db3361f0c0615027bdd8a3e49cc174dacc564e9"
+  integrity sha512-UYnfiB0RasZG8MeiqLYnmkwaI4fDbJ+o2GGesZxkiFcNHXjEF64EnPeZASbxmfPmY8N5qbT68EVhKaIpQrHlvA==
+  dependencies:
+    "@aws-cdk/aws-certificatemanager" "1.77.0"
+    "@aws-cdk/aws-cloudwatch" "1.77.0"
+    "@aws-cdk/aws-ec2" "1.77.0"
+    "@aws-cdk/aws-iam" "1.77.0"
+    "@aws-cdk/aws-lambda" "1.77.0"
+    "@aws-cdk/aws-s3" "1.77.0"
+    "@aws-cdk/cloud-assembly-schema" "1.77.0"
+    "@aws-cdk/core" "1.77.0"
+    "@aws-cdk/cx-api" "1.77.0"
+    "@aws-cdk/region-info" "1.77.0"
     constructs "^3.2.0"
 
 "@aws-cdk/aws-events@1.77.0":

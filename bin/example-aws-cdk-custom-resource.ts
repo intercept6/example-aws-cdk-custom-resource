@@ -9,4 +9,5 @@ new ExampleAwsCdkCustomResource(app, 'ExampleAwsCdkCustomResource', {
     account: process.env.CDK_DEFAULT_ACCOUNT,
     region: 'ap-northeast-1',
   },
+  certificateArn: process.env.CERTIFICATE_ARN!,
 })
