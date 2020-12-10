@@ -1,4 +1,9 @@
-import * as api from './api'
+import {
+  TargetGroupProperties,
+  ATTR_LOAD_BALANCER_ARNS,
+  ATTR_TARGET_GROUP_FULL_NAME,
+  ATTR_TARGET_GROUP_NAME,
+} from './api'
 import {
   OnEventRequest,
   OnEventResponse,
@@ -12,39 +17,32 @@ const elbv2 = new ELBv2()
 const createTargetGroup = async (
   event: OnEventRequest
 ): Promise<OnEventResponse> => {
-  const name = event.ResourceProperties[api.PROP_TARGET_GROUP_NAME]
-  if (!name) {
-    throw new Error(`${api.PROP_TARGET_GROUP_NAME} is required`)
+  const properties = event.ResourceProperties as TargetGroupProperties
+
+  if (!properties.Name) {
+    throw new Error(`Name is required`)
   }
-  const port = event.ResourceProperties[api.PROP_PORT]
-  if (!port) {
-    throw new Error(`${api.PROP_PORT} is required`)
+  if (!properties.Port) {
+    throw new Error(`Port is required`)
   }
-  const protocol = event.ResourceProperties[api.PROP_PROTOCOL]
-  if (!protocol) {
-    throw new Error(`${api.PROP_PROTOCOL} is required`)
+  if (!properties.ProtocolVersion) {
+    throw new Error(`ProtocolVersion is required`)
   }
-  const protocolVersion = event.ResourceProperties[api.PROP_PROTOCOL_VERSION]
-  if (!protocolVersion) {
-    throw new Error(`${api.PROP_PROTOCOL_VERSION} is required`)
+  if (!properties.VpcId) {
+    throw new Error(`VpcId is required`)
   }
-  const vpcID = event.ResourceProperties[api.PROP_VPC_ID]
-  if (!vpcID) {
-    throw new Error(`${api.PROP_VPC_ID} is required`)
-  }
-  const targetType = event.ResourceProperties[api.PROP_TARGET_TYPE]
-  if (!targetType) {
-    throw new Error(`${api.PROP_TARGET_TYPE} is required`)
+  if (!properties.TargetType) {
+    throw new Error(`TargetType is required`)
   }
 
   const tg = await elbv2
     .createTargetGroup({
-      Name: name,
-      Port: port,
-      Protocol: protocol,
-      ProtocolVersion: protocolVersion,
-      VpcId: vpcID,
-      TargetType: targetType,
+      Name: properties.Name,
+      Port: properties.Port,
+      Protocol: properties.Protocol,
+      ProtocolVersion: properties.ProtocolVersion,
+      VpcId: properties.VpcId,
+      TargetType: properties.TargetType,
     })
     .promise()
 
@@ -53,9 +51,11 @@ const createTargetGroup = async (
   return {
     PhysicalResourceId: tg.TargetGroups![0].TargetGroupArn!,
     Data: {
-      LoadBalancerArns: tg.TargetGroups![0].LoadBalancerArns,
-      TargetGroupName: tg.TargetGroups![0].TargetGroupName,
-      TargetGroupFullName: tg.TargetGroups![0].TargetGroupArn!.split(':')[5],
+      [ATTR_LOAD_BALANCER_ARNS]: tg.TargetGroups![0].LoadBalancerArns,
+      [ATTR_TARGET_GROUP_NAME]: tg.TargetGroups![0].TargetGroupName,
+      [ATTR_TARGET_GROUP_FULL_NAME]: tg.TargetGroups![0].TargetGroupArn!.split(
+        ':'
+      )[5],
     },
   }
 }

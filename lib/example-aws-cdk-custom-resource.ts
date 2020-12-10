@@ -1,4 +1,4 @@
-import * as api from '../src/lambda/api'
+import { TargetGroupProperties } from '../src/lambda/api'
 import { SubnetType, Vpc } from '@aws-cdk/aws-ec2'
 import { PolicyStatement } from '@aws-cdk/aws-iam'
 import { Code, Function, Runtime } from '@aws-cdk/aws-lambda'
@@ -59,13 +59,13 @@ export class ExampleAwsCdkCustomResource extends Stack {
     new CustomResource(this, 'custom-target-group', {
       serviceToken: provider.serviceToken,
       properties: {
-        [api.PROP_TARGET_GROUP_NAME]: 'grpc-tg',
-        [api.PROP_PORT]: 50051,
-        [api.PROP_PROTOCOL]: 'HTTP',
-        [api.PROP_PROTOCOL_VERSION]: 'GRPC',
-        [api.PROP_VPC_ID]: vpc.vpcId,
-        [api.PROP_TARGET_TYPE]: 'ip',
-      },
+        Name: 'grpc-tg',
+        Port: 50051,
+        Protocol: 'HTTP',
+        ProtocolVersion: 'GRPC',
+        VpcId: vpc.vpcId,
+        TargetType: 'ip',
+      } as TargetGroupProperties,
     })
   }
 }
