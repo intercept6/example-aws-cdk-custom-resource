@@ -7,7 +7,7 @@ import {
   ApplicationTargetGroup,
 } from '@aws-cdk/aws-elasticloadbalancingv2'
 import { PolicyStatement } from '@aws-cdk/aws-iam'
-import { Code, Function, Runtime } from '@aws-cdk/aws-lambda'
+import { Code, Runtime, SingletonFunction } from '@aws-cdk/aws-lambda'
 import {
   AssetHashType,
   Construct,
@@ -37,7 +37,8 @@ export class ExampleAwsCdkCustomResource extends Stack {
       subnetConfiguration: [{ subnetType: SubnetType.PUBLIC, name: 'public' }],
     })
 
-    const onEvent = new Function(this, 'control-target-group', {
+    const onEvent = new SingletonFunction(this, 'control-target-group', {
+      uuid: '4ddd3cf8-0a1b-43ee-994e-c15a2ffe1bd2',
       code: Code.fromAsset(resolve(__dirname, '..'), {
         assetHashType: AssetHashType.OUTPUT,
         bundling: {
