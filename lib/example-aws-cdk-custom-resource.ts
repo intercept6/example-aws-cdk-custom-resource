@@ -37,7 +37,7 @@ export class ExampleAwsCdkCustomResource extends Stack {
       subnetConfiguration: [{ subnetType: SubnetType.PUBLIC, name: 'public' }],
     })
 
-    const onEvent = new SingletonFunction(this, 'control-target-group', {
+    const onEventHandler = new SingletonFunction(this, 'control-target-group', {
       uuid: '4ddd3cf8-0a1b-43ee-994e-c15a2ffe1bd2',
       code: Code.fromAsset(resolve(__dirname, '..'), {
         assetHashType: AssetHashType.OUTPUT,
@@ -68,9 +68,7 @@ export class ExampleAwsCdkCustomResource extends Stack {
         }),
       ],
     })
-    const provider = new Provider(this, 'provider', {
-      onEventHandler: onEvent,
-    })
+    const provider = new Provider(this, 'provider', { onEventHandler })
     const customResource = new CustomResource(this, 'custom-target-group', {
       serviceToken: provider.serviceToken,
       properties: {
