@@ -80,6 +80,11 @@ export class ExampleAwsCdkCustomResource extends Stack {
         ProtocolVersion: 'GRPC',
         VpcId: vpc.vpcId,
         TargetType: 'ip',
+        HealthCheckEnabled: 'true',
+        HealthCheckPath: '/Package.Service/Method',
+        Matcher: {
+          GrpcCode: '0-99',
+        },
       } as TargetGroupProperties,
     })
     const grpcTargetGroup = ApplicationTargetGroup.fromTargetGroupAttributes(

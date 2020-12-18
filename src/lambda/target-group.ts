@@ -62,7 +62,7 @@ const createTargetGroup = async (
       ProtocolVersion,
       VpcId,
       TargetType,
-      HealthCheckEnabled,
+      HealthCheckEnabled: HealthCheckEnabled === 'true',
       HealthCheckIntervalSeconds,
       HealthCheckPath,
       HealthCheckPort,
@@ -119,7 +119,7 @@ const updateTargetGroup = async (
   const tg = await elbv2
     .modifyTargetGroup({
       TargetGroupArn: event.PhysicalResourceId,
-      HealthCheckEnabled,
+      HealthCheckEnabled: HealthCheckEnabled === 'true',
       HealthCheckIntervalSeconds,
       HealthCheckPath,
       HealthCheckPort,
